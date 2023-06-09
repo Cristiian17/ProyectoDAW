@@ -1,0 +1,26 @@
+﻿@page "/Registro"
+
+<div class="wrapper">
+    <div class="chincheta">
+        <img src="chincheta.png" alt="chincheta">
+    </div>
+    <div class="logo">
+        <img src="" alt="">
+    </div>
+    <div class="text-center mt-4 name">
+        Notas
+    </div>
+    <div class="form-field d-flex align-items-center">
+        <span class="fas fa-key"></span>
+        <input @bind-value="Email" type="text" name="email" id="email" placeholder="Email" required="">
+    </div>
+    <div class="form-field d-flex align-items-center">
+        <span class="far fa-user"></span>
+        <input @bind-value="UserName" type="text" name="userName" id="userName" placeholder="Nombre Usuario">
+    </div>
+    <div class="form-field d-flex align-items-center">
+        <span class="fas fa-key"></span>
+        <input @bind-value="Password" type="password" name="password" id="pwd" placeholder="Contraseña">
+    </div>
+    <button @onclick="Register" class="btn mt-3">Registrarse</button>
+</div>

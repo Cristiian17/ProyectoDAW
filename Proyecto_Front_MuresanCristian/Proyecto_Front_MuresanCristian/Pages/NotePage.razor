@@ -1,0 +1,10 @@
+﻿@page "/Notes"
+<h3>NotePage</h3>
+
+@{
+    foreach(var note in Notes)
+    {
+      <p>@note.Title</p>
+      <p>@note.Content</p>
+    };
+}

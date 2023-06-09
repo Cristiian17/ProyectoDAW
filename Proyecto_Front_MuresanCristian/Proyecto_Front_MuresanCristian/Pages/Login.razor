@@ -1,0 +1,39 @@
+﻿@page "/"
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Notas</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Delicious+Handrawn&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Fasthand&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        
+        <div class="wrapper">
+            <div class="chincheta">
+                <img src="chincheta.png" alt="chincheta">
+            </div>
+            <?= MensajeFlash::imprimirMensajes()?>
+            <div class="logo">
+                <img src="" alt="">
+            </div>
+            <div class="text-center mt-4 name">
+                Notas
+            </div>
+                <div class="form-field align-items-center">
+                    <span class="far fa-user"></span>
+                    <input @bind-value="Email" type="text" name="email" id="email" placeholder="Email">
+                </div>
+                <div class="form-field d-flex align-items-center">
+                    <span class="fas fa-key"></span>
+                    <input @bind-value="Password" type="password" name="password" id="pwd" placeholder="Contraseña">
+                </div>
+                <button @onclick="CheckLogin" class="btn mt-3">Login</button>
+            <div class="text-center fs-6">
+                <a href="/Registro">Registrarse</a>
+            </div>
+        </div>
+    </body>
+</html>
