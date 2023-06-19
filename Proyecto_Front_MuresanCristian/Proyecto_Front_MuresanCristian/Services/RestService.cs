@@ -10,15 +10,16 @@ namespace Proyecto_Front_MuresanCristian.Services
     public class RestService : IRestService
     {
         public readonly string baseUrl = "https://localhost:7291/";
-        
+        private readonly HttpClientHandler _httpClientHandler;
 
-        public RestService()
+        public RestService(HttpClientHandler httpClientHandler)
         {
+            _httpClientHandler = httpClientHandler;
         }
 
         public async Task<bool> AddUsser(User user)
         {
-            using (var client = new HttpClient())
+            using (var client = GetHttpClient())
             {
 
                 var userEnpoit = $"{baseUrl}Users";
@@ -38,10 +39,34 @@ namespace Proyecto_Front_MuresanCristian.Services
                 return bool.Parse(json);
             }
         }
+        public async Task<bool> GetUserByEmail(string email, UserInfo userInfo)
+        {
+            using (var client = new HttpClient())
+            {
+                var userEnpoit = $"{baseUrl}Users/{email}";
+                var request = new HttpRequestMessage()
+                {
+                    RequestUri = new Uri(userEnpoit),
+                    Method = HttpMethod.Get
+                };
+                request.Headers.Add("Authorization", $"Bearer {userInfo.Token}");
+
+                var response = await client.SendAsync(request);
+
+                var json = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return bool.Parse(json);
+                }
+
+                return bool.Parse(json);
+            }
+        }
 
         public async Task<UserInfo> Login(User user)
         {
-            using (var client = new HttpClient())
+            using (var client = GetHttpClient())
             {
                 var loginEndpoit = $"{baseUrl}Login";
 
@@ -60,6 +85,28 @@ namespace Proyecto_Front_MuresanCristian.Services
                 var userInfo = JsonConvert.DeserializeObject<UserInfo>(json);
 
                 return userInfo;
+            }
+        }
+
+        public async Task<UserInfo> RegenerateToken(UserInfo userInfo)
+        {
+            using (var client = new HttpClient())
+            {
+                var regenerateTockenEndpoint = $"{baseUrl}Login/RegenerateToken";
+
+                var content = new StringContent(JsonConvert.SerializeObject(userInfo), Encoding.UTF8, "application/json");
+                var response = await client.PostAsync(regenerateTockenEndpoint, content);
+
+                var json = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception(json);
+                }
+
+                var newUserInfo = JsonConvert.DeserializeObject<UserInfo>(json);
+
+                return newUserInfo;
             }
         }
 
@@ -90,11 +137,200 @@ namespace Proyecto_Front_MuresanCristian.Services
                 return notes;
             }
         }
-        public Task<Note> GetSharedUserNotes()
+        public async Task<List<Note>> GetSharedUserNotes(UserInfo userInfo)
         {
-            return null;
+            using (var client = new HttpClient())
+            {
+                var notesEndpoit = $"{baseUrl}Notes/GetSharedNotes";
+
+                var request = new HttpRequestMessage()
+                {
+                    RequestUri = new Uri(notesEndpoit),
+                    Method = HttpMethod.Get
+                };
+                request.Headers.Add("Authorization", $"Bearer {userInfo.Token}");
+
+                var response = await client.SendAsync(request);
+
+                var json = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception(json);
+                }
+
+                var notes = JsonConvert.DeserializeObject<List<Note>>(json);
+
+                return notes;
+            }
         }
 
+        public async Task<Note> AddNote(Note newNote, UserInfo userInfo)
+        {
+            using (var client = new HttpClient())
+            {
+
+                var noteEnpoit = $"{baseUrl}Notes";
+                var content = new StringContent(JsonConvert.SerializeObject(newNote), Encoding.UTF8, "application/json");
+
+                var request = new HttpRequestMessage()
+                {
+                    RequestUri = new Uri(noteEnpoit),
+                    Method = HttpMethod.Post,
+                    Content = new StringContent(JsonConvert.SerializeObject(newNote), Encoding.UTF8, "application/json")
+            };
+                request.Headers.Add("Authorization", $"Bearer {userInfo.Token}");
+
+                var response = await client.SendAsync(request);
+                var json = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception(json);
+                }
+
+                var note = JsonConvert.DeserializeObject<Note>(json);
+
+                return note;
+            }
+        }
+        public async Task<Note> EditNote(Note editedNote, UserInfo userInfo)
+        {
+            using (var client = new HttpClient())
+            {
+
+                var noteEnpoit = $"{baseUrl}Notes";
+
+                var request = new HttpRequestMessage()
+                {
+                    RequestUri = new Uri(noteEnpoit),
+                    Method = HttpMethod.Put,
+                    Content = new StringContent(JsonConvert.SerializeObject(editedNote), Encoding.UTF8, "application/json")
+                };
+                request.Headers.Add("Authorization", $"Bearer {userInfo.Token}");
+
+                var response = await client.SendAsync(request);
+                var json = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception(json);
+                }
+
+                var note = JsonConvert.DeserializeObject<Note>(json);
+
+                return note;
+            }
+        }
+        public async Task<bool> AddFav(Note note, UserInfo userInfo)
+        {
+            using (var client = new HttpClient())
+            {
+
+                var noteEnpoit = $"{baseUrl}Notes/AddFav?noteId={note.Id}";
+
+                var request = new HttpRequestMessage()
+                {
+                    RequestUri = new Uri(noteEnpoit),
+                    Method = HttpMethod.Get
+                };
+                request.Headers.Add("Authorization", $"Bearer {userInfo.Token}");
+
+                var response = await client.SendAsync(request);
+                var json = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception(json);
+                }
+
+                var result = JsonConvert.DeserializeObject<bool>(json);
+
+                return result;
+            }
+        }
+
+        public async Task<bool> DeleteNote(Note note, UserInfo userInfo)
+        {
+            using (var client = new HttpClient())
+            {
+
+                var noteEnpoit = $"{baseUrl}Notes?noteId={note.Id}";
+
+                var request = new HttpRequestMessage()
+                {
+                    RequestUri = new Uri(noteEnpoit),
+                    Method = HttpMethod.Delete
+                };
+                request.Headers.Add("Authorization", $"Bearer {userInfo.Token}");
+
+                var response = await client.SendAsync(request);
+                var json = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception(json);
+                }
+
+                var deleted = JsonConvert.DeserializeObject<bool>(json);
+
+                return deleted;
+            }
+        }
+        public async Task<bool> RemoveFav(Note note, UserInfo userInfo)
+        {
+            using (var client = new HttpClient())
+            {
+
+                var noteEnpoit = $"{baseUrl}Notes/RemoveFav?noteId={note.Id}";
+
+                var request = new HttpRequestMessage()
+                {
+                    RequestUri = new Uri(noteEnpoit),
+                    Method = HttpMethod.Get
+                };
+                request.Headers.Add("Authorization", $"Bearer {userInfo.Token}");
+
+                var response = await client.SendAsync(request);
+                var json = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception(json);
+                }
+
+                var removed = JsonConvert.DeserializeObject<bool>(json);
+
+                return removed;
+            }
+        }
+        public async Task<bool> AddSharedNote(string email, Note note, UserInfo userInfo)
+        {
+            using (var client = new HttpClient())
+            {
+
+                var noteEnpoit = $"{baseUrl}Notes/AddSharedNote?email={email}&noteId={note.Id}";
+
+                var request = new HttpRequestMessage()
+                {
+                    RequestUri = new Uri(noteEnpoit),
+                    Method = HttpMethod.Get
+                };
+                request.Headers.Add("Authorization", $"Bearer {userInfo.Token}");
+
+                var response = await client.SendAsync(request);
+                var json = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception(json);
+                }
+
+                var result = JsonConvert.DeserializeObject<bool>(json);
+
+                return result;
+            }
+        }
 
 
         public string Encrypt(string password)
@@ -129,6 +365,11 @@ namespace Proyecto_Front_MuresanCristian.Services
             byte[] result = transform.TransformFinalBlock(data, 0, data.Length);
 
             return UTF8Encoding.UTF8.GetString(result);
+        }
+
+        private HttpClient GetHttpClient()
+        {
+            return _httpClientHandler == null ? new HttpClient() : new HttpClient(_httpClientHandler);
         }
     }
 }

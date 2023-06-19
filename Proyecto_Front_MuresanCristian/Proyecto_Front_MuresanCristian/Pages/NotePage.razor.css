@@ -1,0 +1,36 @@
+﻿body {
+    background-color: #c8925f;
+}
+.note {
+    margin: 30px;
+    padding: 10px;
+    border-radius: 15px;
+    background-color: #faf979;
+    box-shadow: 13px 13px 20px black;
+    width: 30%;
+    overflow: hidden;
+}
+.notes {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+.editNote {
+    cursor: pointer;
+}
+.content {
+    height: 300px;
+}
+.fa-heart{
+    font-size: 35px;
+    float: right;
+}
+.favorite {
+    color: red;
+}
+@media(max-height: 700px) {
+    .content {
+        height: 100px;
+    }
+}

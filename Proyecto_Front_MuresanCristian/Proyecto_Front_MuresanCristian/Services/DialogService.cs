@@ -14,7 +14,7 @@ namespace Proyecto_Front_MuresanCristian.Services
         {
             return await JsRuntime.InvokeAsync<bool>("SWConfirm", title, description, yes, no);
         }
-        public async Task<bool> AlertAsync(string title, string description, string ok = "Ok", string okIcon = "fa fa-thumbs-up")
+        public async Task<bool> AlertAsync(string title, string description, string ok = "Ok", string okIcon = "")
         {
             return await JsRuntime.InvokeAsync<bool>("SWAlert", title, description, ok, okIcon);
         }

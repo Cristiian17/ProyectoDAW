@@ -9,6 +9,7 @@
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public bool Shared { get; set; }
+        public bool Favorite { get; set; }
     }
 
 

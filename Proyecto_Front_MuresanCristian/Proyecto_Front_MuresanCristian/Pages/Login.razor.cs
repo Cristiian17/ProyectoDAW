@@ -19,13 +19,26 @@ namespace Proyecto_Front_MuresanCristian.Pages
         private string Email { get; set; } = string.Empty;
         private string Password { get; set; } = string.Empty;
 
-        protected override Task OnInitializedAsync()
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            return base.OnInitializedAsync();
+            await base.OnAfterRenderAsync(firstRender);
+            if (firstRender)
+            {
+                await CheckUserInfo();
+            }
+        }
+        private async Task CheckUserInfo()
+        {
+            var userInfo = await LocalStorage.GetItemAsync<UserInfo>("user");
+            if (userInfo != null)
+            {
+                var newUserInfo = await MyRestService.RegenerateToken(userInfo);
+                await LocalStorage.SetItemAsync("user", newUserInfo);
+                Navigation.NavigateTo("/Notes");
+            }
         }
         public async Task CheckLogin()
         {
-
             try
             {
                 if(string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(Email))

@@ -1,10 +1,194 @@
 ﻿@page "/Notes"
-<h3>NotePage</h3>
+@using Blazorise;
+@using Blazorise.Snackbar;
+@using Blazorise.RichTextEdit
+<div class="body">
+<div>
+    <Button Color="Color.Dark" onclick="@ShowMyNotes">Mis notas</Button>
+    <Button Color="Color.Dark" onclick="@ShowFavNotes">Favoritos</Button>
+    <Button Color="Color.Dark" onclick="@ShowSharedNotes">Notas Compartidas</Button>
+    <Button Color="Color.Primary" Clicked="@ShowModal">Añadir Nota</Button>
+    <Button Color="Color.Danger" onclick="@Logout">Cerrar sesion</Button>
+        <Button Color="Color.Secondary" Clicked="@ShowAboutMe">Sobre mi</Button>
+</div>
+<div class="notes">
+    @{
+        if (MyNotesVisible)
+        {
+            foreach(var note in MyNotes)
+            {
+                <div class="note">
+                        <span hidden="@note.Favorite" class="far fa-heart" onclick="@(()=>AddFav(note))"></span>
+                        <span hidden="@(!note.Favorite)" class="fas fa-heart favorite" onclick="@(()=>RemoveFav(note))"></span>
+                    <div class="editNote" onclick="@(()=>EditNote(note))">
+                          <h1>@note.Title</h1>
+                    </div>
+                    <Button Color="Color.Danger" Clicked="@(()=>DeleteNote(note))">Borrar Nota</Button>
+                </div>
+            };
+            
+        }
+        else if (SharedNotesVisible)
+        {
+            foreach(var note in SharedNotes)
+            {
+                <div class="note">
+                    <span hidden="@note.Favorite" class="far fa-heart" onclick="@(()=>AddFav(note))"></span>
+                    <span hidden="@(!note.Favorite)" class="fas fa-heart favorite" onclick="@(()=>RemoveFav(note))"></span>
+                    <div class="editNote" onclick="@(()=>EditNote(note))">
+                        <h1>@note.Title</h1>
+                    </div>
+                </div>
+            };
+        }
+        else if (FavNotesVisible)
+        {
+            foreach(var note in FavNotes)
+            {
+                <div class="note">
+                        <span class="fas fa-heart favorite" onclick="@(()=>RemoveFav(note))"></span>
+                    <div class="editNote" onclick="@(()=>EditNote(note))">
+                          <h1>@note.Title</h1>
+                    </div>
+                </div>
+            };
+        }
 
-@{
-    foreach(var note in Notes)
-    {
-      <p>@note.Title</p>
-      <p>@note.Content</p>
-    };
-}
+    }
+</div>
+
+<Modal Class="modal" @ref="AddNoteModal">
+    <ModalContent Size="ModalSize.Large">
+        <ModalHeader>
+            <h3>Agregar nota</h3>
+        </ModalHeader>
+        <ModalBody>
+            <div class="form-group">
+                <label>Título</label>
+                <input placeholder="Titulo de la nota..." class="form-control" @bind="@noteTitle" />
+            </div>
+            <div class="form-group">
+                <label>Contenido</label>
+                    <RichTextEdit @ref="richTextAdd"
+                              Theme="RichTextEditTheme.Snow"
+                              PlaceHolder="Escriba su nota..."
+                              SubmitOnEnter="false"
+                              ToolbarPosition="Placement.Top">
+                    <Editor></Editor>
+                    <Toolbar>
+                        <RichTextEditToolbarGroup>
+                            <RichTextEditToolbarButton Action="RichTextEditAction.Bold" />
+                            <RichTextEditToolbarButton Action="RichTextEditAction.Italic" />
+                            <RichTextEditToolbarSelect Action="RichTextEditAction.Size">
+                                <RichTextEditToolbarSelectItem Value="small" />
+                                <RichTextEditToolbarSelectItem Selected />
+                                <RichTextEditToolbarSelectItem Value="large" />
+                                <RichTextEditToolbarSelectItem Value="huge">Very Big</RichTextEditToolbarSelectItem>
+                            </RichTextEditToolbarSelect>
+                            <RichTextEditToolbarButton Action="RichTextEditAction.List" Value="ordered" />
+                            <RichTextEditToolbarButton Action="RichTextEditAction.List" Value="bullet" />
+                        </RichTextEditToolbarGroup>
+                        <!-- Custom toolbar content -->
+                        <RichTextEditToolbarGroup Float="Float.End">
+                        </RichTextEditToolbarGroup>
+                    </Toolbar>
+                </RichTextEdit>
+            </div>
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Primary" @onclick="@AddNote">Añadir nota</Button>
+            <Button Color="Color.Secondary" @onclick="@(HideAddModal)">Cerrar</Button>
+        </ModalFooter>
+     </ModalContent>
+</Modal>
+
+<Modal Class="modal" @ref="EditNoteModal">
+    <ModalContent Size="ModalSize.Large">
+        <ModalBody>
+            <div class="form-group">
+                <label>Título</label>
+                <input class="form-control" @bind="@noteTitle" />
+            </div>
+            <div class="form-group">
+                <label>Contenido</label>
+                @*<textarea class="form-control content" @bind="@noteContent"></textarea>*@
+                    <RichTextEdit @ref="richTextEdit"
+                                  Theme="RichTextEditTheme.Snow"
+                                  PlaceHolder="Escriba su nota..."
+                                  SubmitOnEnter="false"
+                                  ToolbarPosition="Placement.Top">
+                        <Editor></Editor>
+                        <Toolbar>
+                            <RichTextEditToolbarGroup>
+                                <RichTextEditToolbarButton Action="RichTextEditAction.Bold" />
+                                <RichTextEditToolbarButton Action="RichTextEditAction.Italic" />
+                                <RichTextEditToolbarSelect Action="RichTextEditAction.Size">
+                                    <RichTextEditToolbarSelectItem Value="small" />
+                                    <RichTextEditToolbarSelectItem Selected />
+                                    <RichTextEditToolbarSelectItem Value="large" />
+                                    <RichTextEditToolbarSelectItem Value="huge">Very Big</RichTextEditToolbarSelectItem>
+                                </RichTextEditToolbarSelect>
+                                <RichTextEditToolbarButton Action="RichTextEditAction.List" Value="ordered" />
+                                <RichTextEditToolbarButton Action="RichTextEditAction.List" Value="bullet" />
+                            </RichTextEditToolbarGroup>
+                            <!-- Custom toolbar content -->
+                            <RichTextEditToolbarGroup Float="Float.End">
+                            </RichTextEditToolbarGroup>
+                        </Toolbar>
+                    </RichTextEdit>
+            </div>
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Primary" @onclick="@EditNote">Editar nota</Button>
+            <Button Color="Color.Secondary" @onclick="@(HideEditModal)">Cerrar</Button>
+            @{
+            if (MyNotesVisible)
+            {
+                <Button Color="Color.Secondary" @onclick="@ShareNoteModal">Compartir</Button>
+            }
+            }
+           
+        </ModalFooter>
+    </ModalContent>
+
+</Modal>
+    <Modal Class="modal" @ref="SharedEmailModal">
+        <ModalContent Size="ModalSize.Large">
+            <ModalBody>
+                    <label>Email a compartir</label>
+                    <input class="form-control" @bind="@SharedEmail" />
+            </ModalBody>
+            <ModalFooter>
+                <Button Color="Color.Secondary" @onclick="@ShareNote">Compartir nota</Button>
+            </ModalFooter>
+        </ModalContent>
+</Modal>
+<Modal Class="modal" @ref="AboutMeModal">
+    <ModalContent Size="ModalSize.Fullscreen">
+        <ModalHeader>
+            <h3>Sobre mi</h3>
+        </ModalHeader>
+        <ModalBody>
+            <img src="cv.png" />
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Secondary" @onclick="@(HideAboutMeModal)">Cerrar</Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
+<Snackbar @ref="MessageSnackbar" Color="SnackbarColor.Primary" Interval="2000" Location="SnackbarLocation.End">
+    <SnackbarBody>
+        Nota editada correctamente
+    </SnackbarBody>
+</Snackbar>
+    <Snackbar @ref="SharedOKSnackbar" Color="SnackbarColor.Primary" Interval="2000" Location="SnackbarLocation.End">
+        <SnackbarBody>
+            Nota compartida correctamente
+        </SnackbarBody>
+    </Snackbar>
+    <Snackbar @ref="SharedFailSnackbar" Color="SnackbarColor.Primary" Interval="2000" Location="SnackbarLocation.End">
+        <SnackbarBody>
+            Fallo al compartir la nota
+        </SnackbarBody>
+    </Snackbar>
+</div>

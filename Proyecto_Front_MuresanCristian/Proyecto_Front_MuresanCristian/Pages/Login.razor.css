@@ -2,12 +2,11 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Fasthand', cursive;
+    user-select: none
 }
 
 body {
-    background: #ecf0f3;
-    background-image: url(corcho.jpg);
+    background-color: #c8925f;
 }
 
 .wrapper {
@@ -18,6 +17,10 @@ body {
     background-color: #F3ECAA;
     border-radius: 15px;
     box-shadow: 13px 13px 20px black;
+}
+.title {
+    font-family: 'Fasthand', cursive;
+    font-size: 2rem;
 }
 
 .logo {
@@ -64,7 +67,6 @@ body {
     padding: 10px 15px 10px 10px;
     font-family: 'Delicious Handrawn', cursive;
 }
-
 .wrapper .form-field {
     padding-left: 10px;
     margin-bottom: 20px;
@@ -107,7 +109,4 @@ body {
         margin: 30px 20px;
         padding: 40px 15px 15px 15px;
     }
-}
-#blazor-error-ui{
-    display: none;
 }
