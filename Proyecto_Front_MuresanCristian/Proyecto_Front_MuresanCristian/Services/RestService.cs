@@ -369,7 +369,7 @@ namespace Proyecto_Front_MuresanCristian.Services
 
         private HttpClient GetHttpClient()
         {
-            return _httpClientHandler == null ? new HttpClient() : new HttpClient(_httpClientHandler);
+            return _httpClientHandler == null ? new HttpClient() : new HttpClient(_httpClientHandler, false);
         }
     }
 }
